@@ -43,6 +43,13 @@ function App() {
     setTodoDescription('') // Limpiar el input después de agregar
   }
 
+
+ // Esta función elimina una tarea por su índice
+ const handleDelete = (indexToDelete: number) => {
+  const updatedList = todoList.filter((_, index) => index !== indexToDelete)
+  setTodoList(updatedList)
+ }
+
   const handleBox = (e: any) => {
     const tempTodoList = [...todoList]
     const firstTodo = tempTodoList[0];
@@ -58,18 +65,31 @@ function App() {
         <input
         value = {todoDescription} 
         onChange={handleChange}
-        style = {{marginRight: 10}}/>
+        style = {{marginRight: 10}}
+        />
         <button onClick={handleClick}>Add Item</button>
       </div>
+      
       <div>TODOS Here</div>
       <ul>
-        {todoList.map((todo, index) => {
-          return <li key={index}>
-            <input type="checkbox" onClick={handleBox}/>
-            {todo.description + " - " + currentTime}</li>
-        })}
-      </ul>
-    </div>
+
+      {todoList.map((todo, index) => {
+            return (
+              <li key={index}>
+                <input type="checkbox" />
+                {todo.description}
+                {/* Botón de eliminar tarea */}
+                <button
+                  onClick={() => handleDelete(index)}
+                  style={{ marginLeft: 10, color: 'white', backgroundColor: 'grey' }}
+                >
+                  Delete
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
     </>
   )
 }
