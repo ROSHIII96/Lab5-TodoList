@@ -3,91 +3,134 @@ import './App.css'
 
 interface Todo {
   description: string
+  completed: boolean
+  time: string
 }
 
 function App() {
-  const currentTime = new Date().toLocaleTimeString(); 
-  const [todoDescription, setTodoDescription] = useState('')
-  //const [todoList, setTodoList] = useState<Todo[]>([])
+  //const currentTime = new Date().toLocaleTimeString(); 
+  const currentDate = new Date().toLocaleDateString('en-US');   
+  const [TodoDescription, setTodoDescription] = useState('')
 
-  // Recuperar datos del Local Storage al iniciar
-  const [todoList, setTodoList] = useState<Todo[]>(() => {
-  const savedTodos = localStorage.getItem('todoList')
-  return savedTodos ? JSON.parse(savedTodos) : []
-})
-
-  // Recuperar datos del Local Storage al montar el componente
+  // Recuperar los datos del Local Storage al iniciar
+  const [TodoList, setTodoList] = useState<Todo[]>(() => {
+    const savedTodo = localStorage.getItem('TodoList')
+    return savedTodo ? JSON.parse(savedTodo) : []
+  })
+  
+    // Guardar datos en Local Storage
   useEffect(() => {
-    const savedTodos = localStorage.getItem('todoList')
-    if (savedTodos) {
-      setTodoList(JSON.parse(savedTodos))
-    }
-  }, [])
+    localStorage.setItem('TodoList', JSON.stringify(TodoList))
+  }, [TodoList])
 
-  // Guardar datos en Local Storage cuando cambie la lista de tareas
-  useEffect(() => {
-    localStorage.setItem('todoList', JSON.stringify(todoList))
-  }, [todoList])
-
+  //Guarda el valor del input en la variable TodoDescription
   const handleChange = (e: any) => {
     setTodoDescription(e.target.value)
   }
 
-  const handleClick = () => {
-    const tempTodoList = [...todoList]
-    const newTodo = {
-      description: todoDescription
-    }
-    tempTodoList.unshift(newTodo)  //guarda al inicio
-    setTodoList(tempTodoList)
-    setTodoDescription('') // Limpiar el input después de agregar
-  }
+//Funcion para que al tocar el boton Add product, este guarde en la lista el valor
+const handleClick = () => {
+  //if (ProductDescription) {  //Para evitar que si este vacio el campo, no se guarde
+  const tempTodoList = [...TodoList]
+  const newTodo = {
+    description: TodoDescription,
+    completed: false,
+    time: ""
+  } 
+  tempTodoList.unshift(newTodo)  //guarda al inicio
+  setTodoList(tempTodoList)
+  setTodoDescription('') // Limpia el input
+/*}
+else{
+  alert("Porfavor ingrese un producto")
+}*/
+}
 
 
- // Esta función elimina una tarea por su índice
+
+ //Esta función elimina una tarea por su índice(cambioEmma)
  const handleDelete = (indexToDelete: number) => {
-  const updatedList = todoList.filter((_, index) => index !== indexToDelete)
+  const updatedList = TodoList.filter((_, index) => index !== indexToDelete)
   setTodoList(updatedList)
  }
 
-  const handleBox = (e: any) => {
-    const tempTodoList = [...todoList]
-    const firstTodo = tempTodoList[0];
-    tempTodoList.shift()
-    tempTodoList.push(firstTodo)
-    setTodoList(tempTodoList)
+  //Funcion para actualizar el producto de la lista
+  const handleUpdate = (indexToUpdate: number) => {
+    if (TodoDescription) {
+      const updatedTodo = [...TodoList]
+      updatedTodo[indexToUpdate] = {
+        ...updatedTodo[indexToUpdate],
+        description: TodoDescription, // Actualiza la descripción
+      }
+      setTodoList(updatedTodo)
+    }
+
   }
+
+  // Funcion para manejar el cambio en el checkbox (CambioEmma)
+const handleComplete = (indexToUpdate: number) => {
+  const updatedTodoList = [...TodoList]
+  updatedTodoList[indexToUpdate].completed = !updatedTodoList[indexToUpdate].completed
+  setTodoList(updatedTodoList)
+}
+
+const handleCheckBox = (index: number) => {
+  const tempTodoList = [...TodoList];
+  const updatedTodo = { ...tempTodoList[index] };
+  updatedTodo.completed = !updatedTodo.completed;  
+  updatedTodo.time = updatedTodo.completed ? currentDate : "";  
+
+ 
+  tempTodoList[index] = updatedTodo;
+
+  //las completadas van al final
+  const sortedList = tempTodoList.sort((a, b) => {
+    if (a.completed === b.completed) return 0;
+    return a.completed ? 1 : -1;  // Las tareas completadas se mueven al final
+  });
+
+  // Actualiza 
+  setTodoList(sortedList);
+};
+
 
   return (
     <>
     <div style={{border: '1px solid red', padding: 10}}>
       <div>
         <input
-        value = {todoDescription} 
-        onChange={handleChange}
+
+
+        value = {TodoDescription} 
+        onChange = {handleChange}
         style = {{marginRight: 10}}
         />
-        <button onClick={handleClick}>Add Item</button>
+        <button onClick = {handleClick}>Add Item</button>
+
       </div>
       
       <div>TODOS Here</div>
       <ul>
 
-      {todoList.map((todo, index) => {
-            return (
-              <li key={index}>
-                <input type="checkbox" />
-                {todo.description}
-                {/* Botón de eliminar tarea */}
-                <button
-                  onClick={() => handleDelete(index)}
-                  style={{ marginLeft: 10, color: 'white', backgroundColor: 'grey' }}
-                >
-                  Delete
-                </button>
-              </li>
-            )
-          })}
+
+      {TodoList.map((todo, index) => { //actualizacion para el check(emma)
+  return (
+    <li key={index} style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>
+      <input 
+      type="checkbox" 
+     checked={todo.completed} 
+     onChange={() => handleCheckBox(index)} 
+/>
+
+      {" " + todo.description} - 
+      {todo.completed ? <span> Completado el dia: {todo.time}</span> : <span> No completado</span>}
+      <button onClick={() => handleDelete(index)} style={{ marginLeft: 10, background: 'gray' }}>Eliminar</button>
+      <button onClick={() => handleUpdate(index)} style={{ marginLeft: 10, background: '#D0652B' }}>Update</button>
+    </li>
+  )
+})}
+
+
         </ul>
       </div>
     </>
