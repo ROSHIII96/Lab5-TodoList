@@ -9,7 +9,9 @@ interface Todo {
 
 function App() {
   //const currentTime = new Date().toLocaleTimeString(); 
+
   const currentDate = new Date().toLocaleDateString('en-US');   
+
   const [TodoDescription, setTodoDescription] = useState('')
 
   // Recuperar los datos del Local Storage al iniciar
@@ -48,7 +50,10 @@ else{
 
 
 
+
  //Esta función elimina una tarea por su índice(cambioEmma)
+
+ 
  const handleDelete = (indexToDelete: number) => {
   const updatedList = TodoList.filter((_, index) => index !== indexToDelete)
   setTodoList(updatedList)
@@ -99,6 +104,9 @@ const handleCheckBox = (index: number) => {
     <div style={{border: '1px solid red', padding: 10}}>
       <div>
         <input
+     
+
+
 
 
         value = {TodoDescription} 
@@ -111,6 +119,7 @@ const handleCheckBox = (index: number) => {
       
       <div>TODOS Here</div>
       <ul>
+
 
 
       {TodoList.map((todo, index) => { //actualizacion para el check(emma)
@@ -129,6 +138,7 @@ const handleCheckBox = (index: number) => {
     </li>
   )
 })}
+
 
 
         </ul>
