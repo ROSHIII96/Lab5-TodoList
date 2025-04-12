@@ -3,59 +3,66 @@ import './App.css'
 
 interface Todo {
   description: string
+  completed: boolean
+  time: string
 }
 
 function App() {
-  const currentTime = new Date().toLocaleTimeString(); 
-  const [todoDescription, setTodoDescription] = useState('')
-  //const [todoList, setTodoList] = useState<Todo[]>([])
+  //const currentTime = new Date().toLocaleTimeString(); 
+  const currentTime = new Date().toLocaleTimeString('en-US', { hour12: false });   
+  const [TodoDescription, setTodoDescription] = useState('')
 
-  // Recuperar datos del Local Storage al iniciar
-  const [todoList, setTodoList] = useState<Todo[]>(() => {
-  const savedTodos = localStorage.getItem('todoList')
-  return savedTodos ? JSON.parse(savedTodos) : []
-})
-
-  // Recuperar datos del Local Storage al montar el componente
+  // Recuperar los datos del Local Storage al iniciar
+  const [TodoList, setTodoList] = useState<Todo[]>(() => {
+    const savedTodo = localStorage.getItem('TodoList')
+    return savedTodo ? JSON.parse(savedTodo) : []
+  })
+  
+    // Guardar datos en Local Storage
   useEffect(() => {
-    const savedTodos = localStorage.getItem('todoList')
-    if (savedTodos) {
-      setTodoList(JSON.parse(savedTodos))
-    }
-  }, [])
+    localStorage.setItem('TodoList', JSON.stringify(TodoList))
+  }, [TodoList])
 
-  // Guardar datos en Local Storage cuando cambie la lista de tareas
-  useEffect(() => {
-    localStorage.setItem('todoList', JSON.stringify(todoList))
-  }, [todoList])
-
+  //Guarda el valor del input en la variable TodoDescription
   const handleChange = (e: any) => {
     setTodoDescription(e.target.value)
   }
 
-  const handleClick = () => {
-    const tempTodoList = [...todoList]
-    const newTodo = {
-      description: todoDescription
-    }
-    tempTodoList.unshift(newTodo)  //guarda al inicio
-    setTodoList(tempTodoList)
-    setTodoDescription('') // Limpiar el input después de agregar
-  }
+//Funcion para que al tocar el boton Add product, este guarde en la lista el valor
+const handleClick = () => {
+  //if (ProductDescription) {  //Para evitar que si este vacio el campo, no se guarde
+  const tempTodoList = [...TodoList]
+  const newTodo = {
+    description: TodoDescription,
+    completed: false,
+    time: ""
+  } 
+  tempTodoList.unshift(newTodo)  //guarda al inicio
+  setTodoList(tempTodoList)
+  setTodoDescription('') // Limpia el input
+/*}
+else{
+  alert("Porfavor ingrese un producto")
+}*/
+}
 
-
- // Esta función elimina una tarea por su índice
+ //Esta función elimina una tarea por su índice
  const handleDelete = (indexToDelete: number) => {
-  const updatedList = todoList.filter((_, index) => index !== indexToDelete)
+  const updatedList = TodoList.filter((_, index) => index !== indexToDelete)
   setTodoList(updatedList)
  }
 
-  const handleBox = (e: any) => {
-    const tempTodoList = [...todoList]
-    const firstTodo = tempTodoList[0];
-    tempTodoList.shift()
-    tempTodoList.push(firstTodo)
-    setTodoList(tempTodoList)
+  //Funcion para actualizar el producto de la lista
+  const handleUpdate = (indexToUpdate: number) => {
+    if (TodoDescription) {
+      const updatedTodo = [...TodoList]
+      updatedTodo[indexToUpdate] = {
+        ...updatedTodo[indexToUpdate],
+        description: TodoDescription, // Actualiza la descripción
+      }
+      setTodoList(updatedTodo)
+    }
+
   }
 
   return (
@@ -63,31 +70,28 @@ function App() {
     <div style={{border: '1px solid red', padding: 10}}>
       <div>
         <input
-        value = {todoDescription} 
-        onChange={handleChange}
+        value = {TodoDescription} 
+        onChange = {handleChange}
         style = {{marginRight: 10}}
         />
-        <button onClick={handleClick}>Add Item</button>
+        <button onClick = {handleClick}>Add Item</button>
+
       </div>
       
       <div>TODOS Here</div>
       <ul>
 
-      {todoList.map((todo, index) => {
-            return (
-              <li key={index}>
-                <input type="checkbox" />
-                {todo.description}
-                {/* Botón de eliminar tarea */}
-                <button
-                  onClick={() => handleDelete(index)}
-                  style={{ marginLeft: 10, color: 'white', backgroundColor: 'grey' }}
-                >
-                  Delete
-                </button>
-              </li>
-            )
-          })}
+      {TodoList.map((todo, index) => {
+        return (
+        <li key={index}>
+        <input type="checkbox"/>
+        {"Nombre: " + todo.description + ", Momento del check-->>" + todo.time}
+        <button onClick={() => handleDelete(index)} style={{ marginLeft: 10, background: 'gray' }}>Eliminar</button>
+        <button onClick={() => handleUpdate(index)} style={{ marginLeft: 10, background: '#D0652B' }}>Update</button>
+        </li>
+        )
+        })}
+
         </ul>
       </div>
     </>
