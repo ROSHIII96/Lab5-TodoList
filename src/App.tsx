@@ -2,21 +2,19 @@ import { useState, useEffect } from 'react'
 import './App.css'
 
 interface Todo {
- // id: number 
   description: string
-  //isDone: boolean
 }
 
 function App() {
+  const currentTime = new Date().toLocaleTimeString(); 
   const [todoDescription, setTodoDescription] = useState('')
   //const [todoList, setTodoList] = useState<Todo[]>([])
 
-  // Inicializa la lista desde localStorage, si existe
+  // Recuperar datos del Local Storage al iniciar
   const [todoList, setTodoList] = useState<Todo[]>(() => {
-    const savedTodos = localStorage.getItem('todoList')
-    return savedTodos ? JSON.parse(savedTodos) : []
+  const savedTodos = localStorage.getItem('todoList')
+  return savedTodos ? JSON.parse(savedTodos) : []
 })
-
 
   // Recuperar datos del Local Storage al montar el componente
   useEffect(() => {
@@ -31,7 +29,6 @@ function App() {
     localStorage.setItem('todoList', JSON.stringify(todoList))
   }, [todoList])
 
-
   const handleChange = (e: any) => {
     setTodoDescription(e.target.value)
   }
@@ -41,11 +38,11 @@ function App() {
     const newTodo = {
       description: todoDescription
     }
-
-    tempTodoList.unshift(newTodo)
+    tempTodoList.unshift(newTodo)  //guarda al inicio
     setTodoList(tempTodoList)
     setTodoDescription('') // Limpiar el input después de agregar
   }
+
 
  // Esta función elimina una tarea por su índice
  const handleDelete = (indexToDelete: number) => {
@@ -53,6 +50,13 @@ function App() {
   setTodoList(updatedList)
  }
 
+  const handleBox = (e: any) => {
+    const tempTodoList = [...todoList]
+    const firstTodo = tempTodoList[0];
+    tempTodoList.shift()
+    tempTodoList.push(firstTodo)
+    setTodoList(tempTodoList)
+  }
 
   return (
     <>
@@ -68,6 +72,7 @@ function App() {
       
       <div>TODOS Here</div>
       <ul>
+
       {todoList.map((todo, index) => {
             return (
               <li key={index}>
