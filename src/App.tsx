@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 interface Todo {
@@ -9,7 +9,28 @@ interface Todo {
 
 function App() {
   const [todoDescription, setTodoDescription] = useState('')
-  const [todoList, setTodoList] = useState<Todo[]>([])
+  //const [todoList, setTodoList] = useState<Todo[]>([])
+
+  const [todoList, setTodoList] = useState<Todo[]>(() => {
+  // Recuperar datos del Local Storage al inicializar el estado
+  const savedTodos = localStorage.getItem('todoList')
+  return savedTodos ? JSON.parse(savedTodos) : []
+})
+
+
+  // Recuperar datos del Local Storage al montar el componente
+  useEffect(() => {
+    const savedTodos = localStorage.getItem('todoList')
+    if (savedTodos) {
+      setTodoList(JSON.parse(savedTodos))
+    }
+  }, [])
+
+  // Guardar datos en Local Storage cuando cambie la lista de tareas
+  useEffect(() => {
+    localStorage.setItem('todoList', JSON.stringify(todoList))
+  }, [todoList])
+
 
   const handleChange = (e: any) => {
     setTodoDescription(e.target.value)
@@ -23,7 +44,7 @@ function App() {
 
     tempTodoList.unshift(newTodo)
     setTodoList(tempTodoList)
-
+    setTodoDescription('') // Limpiar el input después de agregar
   }
 
   return (
@@ -40,7 +61,7 @@ function App() {
       <ul>
         {todoList.map((todo, index) => {
           return <li key={index}>
-            <input type="checkbox" />
+            <input type="checkbox"/>
             {todo.description}</li>
         })}
       </ul>
