@@ -62,6 +62,7 @@ else{
       }
       setTodoList(updatedTodo)
     }
+
   }
 
   return (
@@ -74,7 +75,9 @@ else{
         style = {{marginRight: 10}}
         />
         <button onClick = {handleClick}>Add Item</button>
+
       </div>
+      
       <div>TODOS Here</div>
       <ul>
 
@@ -88,6 +91,7 @@ else{
         </li>
         )
         })}
+
         </ul>
       </div>
     </>
